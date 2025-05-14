@@ -1,0 +1,52 @@
+PROGRAM:
+# Required libraries
+import pandas as pd
+from prophet import Prophet
+import matplotlib.pyplot as plt
+import random
+import time
+from cryptography.fernet import Fernet
+import csv
+# 1. DEMAND FORECASTING
+df = pd.DataFrame({
+'ds': pd.date_range(start='2023-01-01', periods=100, freq='D'),
+'y': [100 + i + (i % 5) * 3 for i in range(100)] # synthetic pattern
+})
+model = Prophet()
+model.fit(df)
+future = model.make_future_dataframe(periods=30)
+forecast = model.predict(future)
+# Plot forecast
+model.plot(forecast)
+plt.title("Demand Forecast using Prophet")
+plt.xlabel("Date")
+plt.ylabel("Demand")plt.tight_layout()
+plt.savefig("demand_forecast.png")
+plt.close()
+# 2. SIMULATED IOT DATA STREAM
+def simulate_iot_data(n=5):
+print("Simulated IoT Readings:")
+for _ in range(n):
+data = {
+'temperature': round(random.uniform(20.0, 30.0), 2),
+'humidity': round(random.uniform(40.0, 60.0), 2),
+'timestamp': pd.Timestamp.now()
+}
+print(data)
+time.sleep(1)
+simulate_iot_data()
+# 3. BASIC DATA ENCRYPTION USING FERNET
+# Generate and store a key (one time)
+key = Fernet.generate_key()
+cipher = Fernet(key)
+sample_data = "Sensitive supply chain data"
+encrypted_data = cipher.encrypt(sample_data.encode())
+decrypted_data = cipher.decrypt(encrypted_data).decode()print("\nEncrypted:", encrypted_data)
+print("Decrypted:", decrypted_data)
+# 4. FEEDBACK LOGGING SYSTEM
+def log_feedback(user, feedback):
+with open('feedback_log.csv', mode='a', newline='') as file:
+writer = csv.writer(file)
+writer.writerow([user, feedback])
+print(f"Feedback from {user} logged.")
+log_feedback("Manager1", "Improve delivery route visibility on the dashboard.")
